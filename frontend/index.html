@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Poster Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur px-6 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">🗺️ Map
+            Poster Studio PWA</h1>
+        <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-1 rounded-full border border-teal-500/20">Studio
+            Connected</span>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <section class="bg-slate-950/40 border border-slate-800 rounded-2xl p-6 flex flex-col gap-5 h-fit">
+            <h2 class="text-lg font-semibold border-b border-slate-800 pb-2 text-slate-300">Configuration</h2>
+
+            <div>
+                <label class="block text-xs font-medium uppercase tracking-wider text-slate-400 mb-2">Target
+                    City</label>
+                <input type="text" id="cityInput" value="Nairobi, Kenya"
+                    class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-teal-500 transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium uppercase tracking-wider text-slate-400 mb-2">Design
+                    Theme</label>
+                <select id="themeSelect"
+                    class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-teal-500 transition-colors">
+                    <option value="noir">Noir Minimalist</option>
+                    <option value="terracotta">Warm Terracotta</option>
+                    <option value="vintage">Vintage Blueprint</option>
+                    <option value="nordic">Nordic Frost</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium uppercase tracking-wider text-slate-400 mb-2">Zoom
+                    Radius</label>
+                <input type="range" id="radiusInput" min="1" max="15" value="5" class="w-full accent-teal-500">
+                <div class="flex justify-between text-xs text-slate-500 mt-1"><span>Tight Crop</span><span>Wide
+                        Horizon</span></div>
+            </div>
+
+            <button onclick="triggerRender()"
+                class="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-400 hover:to-blue-500 text-slate-950 font-semibold py-3 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] mt-2">
+                Render Print Layout
+            </button>
+        </section>
+
+        <section class="lg:col-span-2 flex flex-col gap-4">
+            <div
+                class="bg-slate-950/20 border border-slate-800 border-dashed rounded-2xl flex-1 min-h-[450px] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
+                <div id="previewContainer"
+                    class="max-w-sm w-full bg-white aspect-[3/4] shadow-2xl rounded border border-slate-200 flex flex-col justify-between p-6 transition-all transform hover:scale-[1.01]">
+                    <div
+                        class="w-full h-[82%] bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden relative">
+                        <span id="mapStatusText" class="text-sm text-slate-400 font-medium">Ready to render
+                            canvas...</span>
+                    </div>
+                    <div class="text-center pb-2">
+                        <h3 id="labelCity" class="text-slate-900 font-bold text-xl tracking-widest uppercase">NAIROBI
+                        </h3>
+                        <p id="labelSub" class="text-slate-500 text-[10px] tracking-widest uppercase mt-0.5">KENYA —
+                            1.2921° S, 36.8219° E</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function triggerRender() {
+            const city = document.getElementById('cityInput').value;
+            const theme = document.getElementById('themeSelect').value;
+            const radius = document.getElementById('radiusInput').value;
+            const statusText = document.getElementById('mapStatusText');
+
+            document.getElementById('labelCity').innerText = city.split(',')[0].trim();
+            document.getElementById('labelSub').innerText = city.toUpperCase();
+
+            statusText.innerText = Connecting to local python rendering engine for ${ city }...;
+
+            try {
+                const response = await fetch(http://127.0.0.1:8000/render?city=${encodeURIComponent(city)}&theme=${theme}&radius=${radius});
+                                        if (response.ok) {
+                    statusText.innerText = "Poster render pipeline completed successfully!";
+                } else {
+                    statusText.innerText = "Engine reached, but layout processing failed.";
+                }
+            } catch (err) {
+                statusText.innerText = "Python app is offline. Run 'uvicorn app:app --reload' locally!";
+            }
+        }
+    </script>
+</body>
+
+</html>
